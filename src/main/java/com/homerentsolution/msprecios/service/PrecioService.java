@@ -1,5 +1,7 @@
 package com.homerentsolution.msprecios.service;
 
+import com.homerentsolution.msprecios.dto.PrecioRequestDTO;
+import com.homerentsolution.msprecios.dto.PrecioResponseDTO;
 import com.homerentsolution.msprecios.model.Precio;
 import com.homerentsolution.msprecios.repository.PrecioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,24 +19,40 @@ public class PrecioService {
         return repository.findAll();
     }
 
-    // GUARDAR
-    public Precio guardar(Precio precio) {
+    // GUARDAR en dto
+    public PrecioResponseDTO guardar(PrecioRequestDTO dto) {
+
+        // Convertir DTO a Entity
+        Precio precio = new Precio();
+
+        precio.setTemporada(dto.getTemporada());
+        precio.setMultiplicador(dto.getMultiplicador());
+        precio.setIdPropiedad(dto.getIdPropiedad());
 
         // Regla de negocio
-        //Validar que el multiplicador no sea menor a 1
-        if (precio.getMultiplicador() < 1) {
-            throw new RuntimeException("El multiplicador no puede ser menor a 1");
+        //multiplicador mayor a 0
+        if (precio.getMultiplicador() <= 0) {
+            throw new RuntimeException(
+                    "El multiplicador debe ser mayor a 0"
+            );
         }
 
-        // Validar temporadas válidas- alta,media,baja
-        if (!precio.getTemporada().equalsIgnoreCase("alta") &&
-                !precio.getTemporada().equalsIgnoreCase("media") &&
-                !precio.getTemporada().equalsIgnoreCase("baja")) {
+        Precio guardado = repository.save(precio);
 
-            throw new RuntimeException("Temporada inválida");
-        }
+        // Convertir Entity a ResponseDTO
+        PrecioResponseDTO response =
+                new PrecioResponseDTO();
 
-        return repository.save(precio);
+        response.setIdPrecios(guardado.getIdPrecios());
+        response.setTemporada(guardado.getTemporada());
+        response.setMultiplicador(
+                guardado.getMultiplicador()
+        );
+        response.setIdPropiedad(
+                guardado.getIdPropiedad()
+        );
+
+        return response;
     }
 
     // BUSCAR POR ID
@@ -62,5 +80,30 @@ public class PrecioService {
     public void eliminar(Long id) {
         repository.deleteById(id);
     }
+
+    // Buscar precios por temporada
+    public List<Precio> buscarPorTemporada(String temporada) {
+
+        return repository.findByTemporada(temporada);
+    }
+
+    // Buscar precios por propiedad
+    public List<Precio> buscarPorPropiedad(Long idPropiedad) {
+
+        return repository.findByIdPropiedad(idPropiedad);
+    }
+
+    // Buscar precios por temporada ordenados de mayor a menor
+    public List<Precio> buscarPorTemporadaOrdenado(
+            String temporada) {
+
+        return repository
+                .findByTemporadaOrderByMultiplicadorDesc(
+                        temporada
+                );
+    }
+
+
+
 }
 
