@@ -5,6 +5,8 @@ import com.homerentsolution.msprecios.dto.PrecioResponseDTO;
 import com.homerentsolution.msprecios.model.Precio;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.homerentsolution.msprecios.service.PrecioService;
@@ -19,64 +21,85 @@ public class PrecioController {
     @Autowired
     private PrecioService service;
 
-    //obtener la lista
+    //obtener la lista con responseEntity
     @GetMapping
-    public List<Precio> listar() {
+    public ResponseEntity<List<Precio>> listar() {
 
-        return service.listar();
+        return ResponseEntity.ok(service.listar());
     }
 
-    //post para guardar en dto y que api devuelve
+    //post para guardar en dto y que api- devuelve 201 created
     @PostMapping
-    public PrecioResponseDTO guardar(
+    public ResponseEntity<PrecioResponseDTO> guardar(
             @Valid @RequestBody PrecioRequestDTO dto) {
 
-        return service.guardar(dto);
+        PrecioResponseDTO respuesta = service.guardar(dto);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(respuesta);
     }
 
-    //buscar por Id
+    //buscar por Id con respuesta entity
     @GetMapping("/{id}")
-    public Precio buscar(@PathVariable Long id) {
-        return service.buscarPorId(id);
+    public ResponseEntity<Precio> buscar(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                service.buscarPorId(id));
     }
 
 
-
-    //eliminar
+    //eliminar responseidentity
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        service.eliminar(id);
-    }    //actualizar por id
-    @PutMapping("/{id}")
-    public Precio actualizar(@PathVariable Long id,
-                             @RequestBody Precio precio) {
+    public ResponseEntity<Void> eliminar(
+            @PathVariable Long id) {
 
-        return service.actualizar(id, precio);
+        service.eliminar(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    //actualizar por id con response entity
+    @PutMapping("/{id}")
+    public ResponseEntity<Precio> actualizar(
+            @PathVariable Long id,
+            @RequestBody Precio precio) {
+
+        Precio actualizado =
+                service.actualizar(id, precio);
+
+        return ResponseEntity.ok(actualizado);
     }
 
     // Buscar precios por temporada
     @GetMapping("/temporada/{temporada}")
-    public List<Precio> buscarPorTemporada(
+    public ResponseEntity<List<Precio>> buscarPorTemporada(
             @PathVariable String temporada) {
 
-        return service.buscarPorTemporada(temporada);
+        return ResponseEntity.ok(
+                service.buscarPorTemporada(temporada));
     }
 
     // Buscar precios por propiedad
     @GetMapping("/propiedad/{id}")
-    public List<Precio> buscarPorPropiedad(
+    public ResponseEntity<List<Precio>> buscarPorPropiedad(
             @PathVariable Long id) {
 
-        return service.buscarPorPropiedad(id);
+        return ResponseEntity.ok(
+                service.buscarPorPropiedad(id));
     }
 
     // Buscar precios ordenados por multiplicador
     @GetMapping("/temporada/ordenado/{temporada}")
-    public List<Precio> buscarPorTemporadaOrdenado(
+    public ResponseEntity<List<Precio>> buscarPorTemporadaOrdenado(
             @PathVariable String temporada) {
 
-        return service.buscarPorTemporadaOrdenado(
-                temporada
+        return ResponseEntity.ok(
+                service.buscarPorTemporadaOrdenado(
+                        temporada
+                )
         );
     }
 }
+
