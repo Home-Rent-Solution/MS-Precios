@@ -6,7 +6,7 @@ import com.homerentsolution.msprecios.model.Precio;
 import com.homerentsolution.msprecios.repository.PrecioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.homerentsolution.msprecios.client.PropiedadClient;
 import java.util.List;
 
 @Service
@@ -14,6 +14,10 @@ public class PrecioService {
 
     @Autowired
     private PrecioRepository repository;
+
+    //se agrega Feign para comunicación entre servicios
+    @Autowired
+    private PropiedadClient propiedadClient;
 
     // LISTAR
     public List<Precio> listar() {
@@ -37,6 +41,19 @@ public class PrecioService {
 
             throw new RuntimeException(
                     "El multiplicador debe ser mayor a 0"
+            );
+        }
+
+        // Validar existencia de propiedad en MS-Propiedades
+        Object propiedad =
+                propiedadClient.buscarPropiedad(
+                        dto.getIdPropiedad()
+                );
+
+        if (propiedad == null) {
+
+            throw new RuntimeException(
+                    "La propiedad no existe"
             );
         }
 
