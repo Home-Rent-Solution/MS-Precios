@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.homerentsolution.msprecios.service.PrecioService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -18,12 +20,19 @@ import java.util.List;
 
 public class PrecioController {
 
+    //Inyectar automaticamente las dependencias
     @Autowired
     private PrecioService service;
 
-    //obtener la lista con responseEntity
+    private static final Logger log =
+            LoggerFactory.getLogger(PrecioController.class);
+
+
+    //listartodo con ResponseEntity reponde 200 ok
     @GetMapping
     public ResponseEntity<List<Precio>> listar() {
+
+        log.info("Listando todos los precios");
 
         return ResponseEntity.ok(service.listar());
     }
@@ -33,6 +42,12 @@ public class PrecioController {
     public ResponseEntity<PrecioResponseDTO> guardar(
             @Valid @RequestBody PrecioRequestDTO dto) {
 
+        log.info(
+                "Guardando precio para propiedad {} en temporada {}",
+                dto.getIdPropiedad(),
+                dto.getTemporada()
+        );
+
         PrecioResponseDTO respuesta = service.guardar(dto);
 
         return ResponseEntity
@@ -40,20 +55,24 @@ public class PrecioController {
                 .body(respuesta);
     }
 
-    //buscar por Id con respuesta entity
+    //buscar por Id, en responseEntity responde 200 ok
     @GetMapping("/{id}")
     public ResponseEntity<Precio> buscar(
             @PathVariable Long id) {
+
+        log.info("Buscando precio con ID: {}", id);
 
         return ResponseEntity.ok(
                 service.buscarPorId(id));
     }
 
 
-    //eliminar responseidentity
+    //eliminar, responseidentity devuelve 204  no content
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(
             @PathVariable Long id) {
+
+        log.warn("Eliminando precio con ID: {}", id);
 
         service.eliminar(id);
 
@@ -66,6 +85,8 @@ public class PrecioController {
             @PathVariable Long id,
             @RequestBody Precio precio) {
 
+        log.info("Actualizando precio con ID: {}", id);
+
         Precio actualizado =
                 service.actualizar(id, precio);
 
@@ -76,6 +97,10 @@ public class PrecioController {
     @GetMapping("/temporada/{temporada}")
     public ResponseEntity<List<Precio>> buscarPorTemporada(
             @PathVariable String temporada) {
+        log.info(
+                "Buscando precios para temporada: {}",
+                temporada
+        );
 
         return ResponseEntity.ok(
                 service.buscarPorTemporada(temporada));
@@ -85,6 +110,10 @@ public class PrecioController {
     @GetMapping("/propiedad/{id}")
     public ResponseEntity<List<Precio>> buscarPorPropiedad(
             @PathVariable Long id) {
+        log.info(
+                "Buscando precios para propiedad con ID: {}",
+                id
+        );
 
         return ResponseEntity.ok(
                 service.buscarPorPropiedad(id));
@@ -94,6 +123,10 @@ public class PrecioController {
     @GetMapping("/temporada/ordenado/{temporada}")
     public ResponseEntity<List<Precio>> buscarPorTemporadaOrdenado(
             @PathVariable String temporada) {
+        log.info(
+                "Buscando precios ordenados para temporada: {}",
+                temporada
+        );
 
         return ResponseEntity.ok(
                 service.buscarPorTemporadaOrdenado(
