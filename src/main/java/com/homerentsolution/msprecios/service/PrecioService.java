@@ -11,11 +11,13 @@ import java.util.List;
 
 @Service
 public class PrecioService {
+
     @Autowired
     private PrecioRepository repository;
 
     // LISTAR
     public List<Precio> listar() {
+
         return repository.findAll();
     }
 
@@ -32,6 +34,7 @@ public class PrecioService {
         // Regla de negocio
         //multiplicador mayor a 0
         if (precio.getMultiplicador() <= 0) {
+
             throw new RuntimeException(
                     "El multiplicador debe ser mayor a 0"
             );
@@ -43,11 +46,18 @@ public class PrecioService {
         PrecioResponseDTO response =
                 new PrecioResponseDTO();
 
-        response.setIdPrecios(guardado.getIdPrecios());
-        response.setTemporada(guardado.getTemporada());
+        response.setIdPrecios(
+                guardado.getIdPrecios()
+        );
+
+        response.setTemporada(
+                guardado.getTemporada()
+        );
+
         response.setMultiplicador(
                 guardado.getMultiplicador()
         );
+
         response.setIdPropiedad(
                 guardado.getIdPropiedad()
         );
@@ -57,53 +67,108 @@ public class PrecioService {
 
     // BUSCAR POR ID
     public Precio buscarPorId(Long id) {
-        return repository.findById(id).orElse(null);
+
+        return repository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Precio no encontrado"
+                        ));
     }
 
     // ACTUALIZAR
-    public Precio actualizar(Long id, Precio precioActualizado) {
+    public Precio actualizar(Long id,
+                             Precio precioActualizado) {
 
-        Precio precio = repository.findById(id).orElse(null);
+        Precio precio = repository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Precio no encontrado"
+                        ));
 
-        if (precio != null) {
+        precio.setTemporada(
+                precioActualizado.getTemporada()
+        );
 
-            precio.setTemporada(precioActualizado.getTemporada());
-            precio.setMultiplicador(precioActualizado.getMultiplicador());
-            precio.setIdPropiedad(precioActualizado.getIdPropiedad());
+        precio.setMultiplicador(
+                precioActualizado.getMultiplicador()
+        );
 
-            return repository.save(precio);
-        }
-        return null;
+        precio.setIdPropiedad(
+                precioActualizado.getIdPropiedad()
+        );
+
+        return repository.save(precio);
     }
 
     // ELIMINAR
     public void eliminar(Long id) {
-        repository.deleteById(id);
+
+        Precio precio = repository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Precio no encontrado"
+                        ));
+
+        repository.delete(precio);
     }
 
     // Buscar precios por temporada
-    public List<Precio> buscarPorTemporada(String temporada) {
+    public List<Precio> buscarPorTemporada(
+            String temporada) {
 
-        return repository.findByTemporada(temporada);
+        List<Precio> precios =
+                repository.findByTemporada(
+                        temporada
+                );
+
+        if (precios.isEmpty()) {
+
+            throw new RuntimeException(
+                    "No existen precios para esta temporada"
+            );
+        }
+
+        return precios;
     }
 
     // Buscar precios por propiedad
-    public List<Precio> buscarPorPropiedad(Long idPropiedad) {
+    public List<Precio> buscarPorPropiedad(
+            Long idPropiedad) {
 
-        return repository.findByIdPropiedad(idPropiedad);
+        List<Precio> precios =
+                repository.findByIdPropiedad(
+                        idPropiedad
+                );
+
+        if (precios.isEmpty()) {
+
+            throw new RuntimeException(
+                    "No existen precios para esta propiedad"
+            );
+        }
+
+        return precios;
     }
 
     // Buscar precios por temporada ordenados de mayor a menor
     public List<Precio> buscarPorTemporadaOrdenado(
             String temporada) {
 
-        return repository
-                .findByTemporadaOrderByMultiplicadorDesc(
-                        temporada
-                );
+        List<Precio> precios =
+                repository
+                        .findByTemporadaOrderByMultiplicadorDesc(
+                                temporada
+                        );
+
+        if (precios.isEmpty()) {
+
+            throw new RuntimeException(
+                    "No existen precios ordenados para esta temporada"
+            );
+        }
+
+        return precios;
     }
-
-
 
 }
 
