@@ -6,13 +6,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
-        name = "ms-propiedades",
-        url = "http://localhost:8081"
+        name = "ms-pagos",
+        url = "http://localhost:8085"
 )
-public interface PropiedadClient {
+public interface PagoClient {
 
-    @GetMapping("/api/v1/propiedades/{id}")
-    Object buscarPorId(
+    @GetMapping("/api/v1/pagos/{id}")
+    Object buscarPago(
             @PathVariable Long id
     );
 }

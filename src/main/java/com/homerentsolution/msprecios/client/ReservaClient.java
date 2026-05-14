@@ -3,16 +3,17 @@ package com.homerentsolution.msprecios.client;
 import org.springframework.cloud.openfeign.FeignClient;
 
 import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
-        name = "ms-propiedades",
-        url = "http://localhost:8081"
+        name = "ms-reservas",
+        url = "http://localhost:8084"
 )
-public interface PropiedadClient {
+public interface ReservaClient {
 
-    @GetMapping("/api/v1/propiedades/{id}")
-    Object buscarPorId(
-            @PathVariable Long id
+    @GetMapping("/reservas/{id}/cliente")
+    Object buscarReserva(
+            @PathVariable int id
     );
 }

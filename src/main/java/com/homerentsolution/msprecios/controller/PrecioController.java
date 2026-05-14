@@ -32,7 +32,7 @@ public class PrecioController {
 
     //listartodo con ResponseEntity reponde 200 ok
     @GetMapping
-    public ResponseEntity<List<Precio>> listar() {
+    public ResponseEntity<List<PrecioResponseDTO>> listar() {
 
         log.info("Listando todos los precios");
 
@@ -59,7 +59,7 @@ public class PrecioController {
 
     //buscar por Id, en responseEntity responde 200 ok
     @GetMapping("/{id}")
-    public ResponseEntity<Precio> buscar(
+    public ResponseEntity<PrecioResponseDTO> buscar(
             @PathVariable Long id) {
 
         log.info("Buscando precio con ID: {}", id);
@@ -83,14 +83,14 @@ public class PrecioController {
 
     //actualizar por id con response entity
     @PutMapping("/{id}")
-    public ResponseEntity<Precio> actualizar(
+    public ResponseEntity<PrecioResponseDTO> actualizar(
             @PathVariable Long id,
-            @RequestBody Precio precio) {
+            @RequestBody PrecioRequestDTO dto) {
 
         log.info("Actualizando precio con ID: {}", id);
 
-        Precio actualizado =
-                service.actualizar(id, precio);
+        PrecioResponseDTO actualizado =
+                service.actualizar(id, dto);
 
         return ResponseEntity.ok(actualizado);
     }
