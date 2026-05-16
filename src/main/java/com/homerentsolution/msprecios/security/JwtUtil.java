@@ -18,10 +18,12 @@ public class JwtUtil {
 
     // generar token
     public static String generarToken(
-            String username) {
+            String username,
+            String role) {
 
         return Jwts.builder()
                 .subject(username)
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(
                         new Date(
@@ -67,5 +69,23 @@ public class JwtUtil {
                 .getPayload();
 
         return claims.getSubject();
+    }
+
+    // obtener rol
+    public static String obtenerRole(
+            String token) {
+
+        Claims claims = Jwts.parser()
+                .verifyWith(
+                        (javax.crypto.SecretKey) KEY
+                )
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get(
+                "role",
+                String.class
+        );
     }
 }

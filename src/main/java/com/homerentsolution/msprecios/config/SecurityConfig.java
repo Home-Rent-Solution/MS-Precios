@@ -12,6 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 public class SecurityConfig {
@@ -44,7 +45,36 @@ public class SecurityConfig {
                                 "/auth/**"
                         ).permitAll()
 
-                        .anyRequest().permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/precios/**"
+                        ).hasAnyRole(
+                                "USER",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/v1/precios/**"
+                        ).hasRole(
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/v1/precios/**"
+                        ).hasRole(
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/v1/precios/**"
+                        ).hasRole(
+                                "ADMIN"
+                        )
+
+                        .anyRequest().authenticated()
                 )
 
                 .addFilterBefore(
