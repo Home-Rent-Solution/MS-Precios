@@ -8,9 +8,14 @@ import org.springframework.boot.CommandLineRunner;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Configuration
 public class DataInitializer {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(DataInitializer.class);
 
     @Bean
     CommandLineRunner initDatabase(
@@ -54,9 +59,7 @@ public class DataInitializer {
 
                 repository.save(precio2);
 
-                System.out.println(
-                        "Datos iniciales de precios cargados"
-                );
+                log.info("Datos iniciales de precios cargados");
             }
         };
     }

@@ -3,7 +3,6 @@ package com.homerentsolution.msprecios.controller;
 import com.homerentsolution.msprecios.dto.PrecioRequestDTO;
 import com.homerentsolution.msprecios.dto.PrecioResponseDTO;
 import com.homerentsolution.msprecios.model.Precio;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/v1/precios")
 
@@ -85,7 +83,7 @@ public class PrecioController {
     @PutMapping("/{id}")
     public ResponseEntity<PrecioResponseDTO> actualizar(
             @PathVariable Long id,
-            @RequestBody PrecioRequestDTO dto) {
+            @Valid @RequestBody PrecioRequestDTO dto) {
 
         log.info("Actualizando precio con ID: {}", id);
 
