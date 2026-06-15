@@ -95,7 +95,7 @@ public class PrecioController {
 
     // Buscar precios por temporada
     @GetMapping("/temporada/{temporada}")
-    public ResponseEntity<List<Precio>> buscarPorTemporada(
+    public ResponseEntity<List<PrecioResponseDTO>> buscarPorTemporada(
             @PathVariable String temporada) {
         log.info(
                 "Buscando precios para temporada: {}",
@@ -108,7 +108,7 @@ public class PrecioController {
 
     // Buscar precios por propiedad
     @GetMapping("/propiedad/{id}")
-    public ResponseEntity<List<Precio>> buscarPorPropiedad(
+    public ResponseEntity<List<PrecioResponseDTO>> buscarPorPropiedad(
             @PathVariable Long id) {
         log.info(
                 "Buscando precios para propiedad con ID: {}",
@@ -121,7 +121,7 @@ public class PrecioController {
 
     // Buscar precios ordenados por multiplicador
     @GetMapping("/temporada/ordenado/{temporada}")
-    public ResponseEntity<List<Precio>> buscarPorTemporadaOrdenado(
+    public ResponseEntity<List<PrecioResponseDTO>> buscarPorTemporadaOrdenado(
             @PathVariable String temporada) {
         log.info(
                 "Buscando precios ordenados para temporada: {}",

@@ -10,14 +10,21 @@ import com.homerentsolution.msprecios.dto.PrecioResponseDTO;
 import com.homerentsolution.msprecios.model.Precio;
 
 import com.homerentsolution.msprecios.repository.PrecioRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class PrecioService {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(PrecioService.class);
 
     @Autowired
     private PrecioRepository repository;
@@ -37,6 +44,8 @@ public class PrecioService {
     // LISTAR
     public List<PrecioResponseDTO> listar() {
 
+        log.info("Listando todos los precios");
+
         return repository.findAll()
                 .stream()
                 .map(this::convertirDTO)
@@ -46,12 +55,20 @@ public class PrecioService {
     // BUSCAR POR ID
     public PrecioResponseDTO buscarPorId(Long id) {
 
-        Precio precio = repository.findById(id)
-                .orElseThrow(() ->
+        log.info("Buscando precio con ID {}", id);
 
-                        new RuntimeException(
-                                "Precio no encontrado"
-                        ));
+        Precio precio = repository.findById(id)
+                .orElseThrow(() -> {
+
+                    log.warn(
+                            "Precio con ID {} no encontrado",
+                            id
+                    );
+
+                    return new RuntimeException(
+                            "Precio no encontrado"
+                    );
+                });
 
         return convertirDTO(precio);
     }
@@ -59,6 +76,12 @@ public class PrecioService {
     // GUARDAR
     public PrecioResponseDTO guardar(
             PrecioRequestDTO dto) {
+
+        log.info(
+                "Creando precio para propiedad {} en temporada {}",
+                dto.getIdPropiedad(),
+                dto.getTemporada()
+        );
 
         // validar propiedad
         try {
@@ -69,6 +92,11 @@ public class PrecioService {
 
         } catch (Exception e) {
 
+            log.error(
+                    "La propiedad {} no existe",
+                    dto.getIdPropiedad()
+            );
+
             throw new RuntimeException(
                     "La propiedad no existe"
             );
@@ -76,10 +104,15 @@ public class PrecioService {
 
         // validar reserva
         try {
-
+            // Validación de integración con ms-reservas
+            // Se utiliza un ID de prueba para verificar comunicación Feign
             reservaClient.buscarReserva(1);
 
         } catch (Exception e) {
+
+            log.error(
+                    "No existe una reserva válida asociada"
+            );
 
             throw new RuntimeException(
                     "No existe una reserva válida asociada"
@@ -104,19 +137,29 @@ public class PrecioService {
         // guardar
         Precio guardado =
                 repository.save(precio);
-        // validar pago antes de generar tarifas
-        try {
 
+        // validar pago
+        try {
+            // Validación de integración con ms-pagos
+            // Se utiliza un ID de prueba para verificar comunicación Feign
             pagoClient.buscarPago(1L);
 
         } catch (Exception e) {
+
+            log.error(
+                    "No existe un pago válido asociado"
+            );
 
             throw new RuntimeException(
                     "No existe un pago válido asociado"
             );
         }
 
-        // convertir Entity → DTO
+        log.info(
+                "Precio guardado correctamente con ID {}",
+                guardado.getIdPrecios()
+        );
+
         return convertirDTO(guardado);
     }
 
@@ -125,12 +168,23 @@ public class PrecioService {
             Long id,
             PrecioRequestDTO dto) {
 
-        Precio precio = repository.findById(id)
-                .orElseThrow(() ->
+        log.info(
+                "Actualizando precio con ID {}",
+                id
+        );
 
-                        new RuntimeException(
-                                "Precio no encontrado"
-                        ));
+        Precio precio = repository.findById(id)
+                .orElseThrow(() -> {
+
+                    log.warn(
+                            "Precio con ID {} no encontrado",
+                            id
+                    );
+
+                    return new RuntimeException(
+                            "Precio no encontrado"
+                    );
+                });
 
         precio.setTemporada(
                 dto.getTemporada()
@@ -147,20 +201,41 @@ public class PrecioService {
         Precio actualizado =
                 repository.save(precio);
 
+        log.info(
+                "Precio {} actualizado correctamente",
+                id
+        );
+
         return convertirDTO(actualizado);
     }
 
     // ELIMINAR
     public void eliminar(Long id) {
 
-        Precio precio = repository.findById(id)
-                .orElseThrow(() ->
+        log.warn(
+                "Eliminando precio con ID {}",
+                id
+        );
 
-                        new RuntimeException(
-                                "Precio no encontrado"
-                        ));
+        Precio precio = repository.findById(id)
+                .orElseThrow(() -> {
+
+                    log.warn(
+                            "Precio con ID {} no encontrado",
+                            id
+                    );
+
+                    return new RuntimeException(
+                            "Precio no encontrado"
+                    );
+                });
 
         repository.delete(precio);
+
+        log.info(
+                "Precio {} eliminado correctamente",
+                id
+        );
     }
 
     // CONVERTIR ENTITY → DTO
@@ -190,8 +265,13 @@ public class PrecioService {
     }
 
     // Buscar precios por temporada
-    public List<Precio> buscarPorTemporada(
+    public List<PrecioResponseDTO> buscarPorTemporada(
             String temporada) {
+
+        log.info(
+                "Buscando precios para temporada {}",
+                temporada
+        );
 
         List<Precio> precios =
                 repository.findByTemporada(
@@ -205,12 +285,19 @@ public class PrecioService {
             );
         }
 
-        return precios;
+        return precios.stream()
+                .map(this::convertirDTO)
+                .collect(Collectors.toList());
     }
 
     // Buscar precios por propiedad
-    public List<Precio> buscarPorPropiedad(
+    public List<PrecioResponseDTO> buscarPorPropiedad(
             Long idPropiedad) {
+
+        log.info(
+                "Buscando precios para propiedad {}",
+                idPropiedad
+        );
 
         List<Precio> precios =
                 repository.findByIdPropiedad(
@@ -224,18 +311,24 @@ public class PrecioService {
             );
         }
 
-        return precios;
+        return precios.stream()
+                .map(this::convertirDTO)
+                .collect(Collectors.toList());
     }
 
     // Buscar precios ordenados
-    public List<Precio> buscarPorTemporadaOrdenado(
+    public List<PrecioResponseDTO> buscarPorTemporadaOrdenado(
             String temporada) {
 
+        log.info(
+                "Buscando precios ordenados para temporada {}",
+                temporada
+        );
+
         List<Precio> precios =
-                repository
-                        .findByTemporadaOrderByMultiplicadorDesc(
-                                temporada
-                        );
+                repository.findByTemporadaOrderByMultiplicadorDesc(
+                        temporada
+                );
 
         if (precios.isEmpty()) {
 
@@ -244,6 +337,9 @@ public class PrecioService {
             );
         }
 
-        return precios;
+        return precios.stream()
+                .map(this::convertirDTO)
+                .collect(Collectors.toList());
     }
 }
+
