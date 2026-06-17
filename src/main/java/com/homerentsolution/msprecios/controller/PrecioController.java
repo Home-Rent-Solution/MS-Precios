@@ -3,6 +3,10 @@ package com.homerentsolution.msprecios.controller;
 import com.homerentsolution.msprecios.dto.PrecioRequestDTO;
 import com.homerentsolution.msprecios.dto.PrecioResponseDTO;
 import com.homerentsolution.msprecios.model.Precio;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +21,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/precios")
+@Tag(
+        name = "Precios",
+        description = "Operaciones relacionadas con precios y temporadas"
+)
 
 public class PrecioController {
 
@@ -28,6 +36,20 @@ public class PrecioController {
             LoggerFactory.getLogger(PrecioController.class);
 
 
+    @Operation(
+            summary = "Listar precios",
+            description = "Obtiene todos los precios registrados"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Precios obtenidos correctamente"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor"
+            )
+    })
     //listartodo con ResponseEntity reponde 200 ok
     @GetMapping
     public ResponseEntity<List<PrecioResponseDTO>> listar() {
@@ -37,6 +59,20 @@ public class PrecioController {
         return ResponseEntity.ok(service.listar());
     }
 
+    @Operation(
+            summary = "Crear precio",
+            description = "Registra un nuevo precio"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Precio creado correctamente"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Datos inválidos"
+            )
+    })
     //post para guardar en dto y que api- devuelve 201 created
     @PostMapping
     public ResponseEntity<PrecioResponseDTO> guardar(
@@ -55,6 +91,20 @@ public class PrecioController {
                 .body(respuesta);
     }
 
+    @Operation(
+            summary = "Buscar precio",
+            description = "Obtiene un precio por su identificador"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Precio encontrado"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Precio no encontrado"
+            )
+    })
     //buscar por Id, en responseEntity responde 200 ok
     @GetMapping("/{id}")
     public ResponseEntity<PrecioResponseDTO> buscar(
@@ -66,7 +116,20 @@ public class PrecioController {
                 service.buscarPorId(id));
     }
 
-
+    @Operation(
+            summary = "Eliminar precio",
+            description = "Elimina un precio existente"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Precio eliminado correctamente"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Precio no encontrado"
+            )
+    })
     //eliminar, responseidentity devuelve 204  no content
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(
@@ -79,6 +142,24 @@ public class PrecioController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            summary = "Actualizar precio",
+            description = "Actualiza un precio existente"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Precio actualizado correctamente"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Datos inválidos"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Precio no encontrado"
+            )
+    })
     //actualizar por id con response entity
     @PutMapping("/{id}")
     public ResponseEntity<PrecioResponseDTO> actualizar(
@@ -93,6 +174,20 @@ public class PrecioController {
         return ResponseEntity.ok(actualizado);
     }
 
+    @Operation(
+            summary = "Buscar por temporada",
+            description = "Obtiene todos los precios asociados a una temporada"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Precios encontrados"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No existen precios para la temporada"
+            )
+    })
     // Buscar precios por temporada
     @GetMapping("/temporada/{temporada}")
     public ResponseEntity<List<PrecioResponseDTO>> buscarPorTemporada(
@@ -106,6 +201,20 @@ public class PrecioController {
                 service.buscarPorTemporada(temporada));
     }
 
+    @Operation(
+            summary = "Buscar por propiedad",
+            description = "Obtiene todos los precios asociados a una propiedad"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Precios encontrados"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No existen precios para la propiedad"
+            )
+    })
     // Buscar precios por propiedad
     @GetMapping("/propiedad/{id}")
     public ResponseEntity<List<PrecioResponseDTO>> buscarPorPropiedad(
@@ -119,6 +228,20 @@ public class PrecioController {
                 service.buscarPorPropiedad(id));
     }
 
+    @Operation(
+            summary = "Buscar precios ordenados",
+            description = "Obtiene los precios de una temporada ordenados por multiplicador descendente"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Precios encontrados"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No existen precios para la temporada"
+            )
+    })
     // Buscar precios ordenados por multiplicador
     @GetMapping("/temporada/ordenado/{temporada}")
     public ResponseEntity<List<PrecioResponseDTO>> buscarPorTemporadaOrdenado(

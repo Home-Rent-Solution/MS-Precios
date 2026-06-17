@@ -15,10 +15,10 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(
                         new Info()
-                                .title("API Precios")
-                                .version("1.0")
+                                .title("HomeRentSolution - API Precios")
+                                .version("v1")
                                 .description(
-                                        "Microservicio de gestión de precios Home Rent Solution"
+                                        "Microservicio encargado de la gestión de precios y temporadas."
                                 )
                 );
     }
