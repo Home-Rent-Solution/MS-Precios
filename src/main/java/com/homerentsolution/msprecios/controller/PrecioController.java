@@ -2,13 +2,11 @@ package com.homerentsolution.msprecios.controller;
 
 import com.homerentsolution.msprecios.dto.PrecioRequestDTO;
 import com.homerentsolution.msprecios.dto.PrecioResponseDTO;
-import com.homerentsolution.msprecios.model.Precio;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +28,12 @@ import java.util.List;
 
 public class PrecioController {
 
-    //Inyectar automaticamente las dependencias
-    @Autowired
-    private PrecioService service;
+    //Inyectar automaticamente las dependencias mediante constructor
+    private final PrecioService service;
+
+    public PrecioController(PrecioService service) {
+        this.service = service;
+    }
 
     private static final Logger log =
             LoggerFactory.getLogger(PrecioController.class);

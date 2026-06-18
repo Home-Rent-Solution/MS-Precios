@@ -119,25 +119,6 @@ public class PrecioService {
             );
         }
 
-        // convertir DTO → Entity
-        Precio precio = new Precio();
-
-        precio.setTemporada(
-                dto.getTemporada()
-        );
-
-        precio.setMultiplicador(
-                dto.getMultiplicador()
-        );
-
-        precio.setIdPropiedad(
-                dto.getIdPropiedad()
-        );
-
-        // guardar
-        Precio guardado =
-                repository.save(precio);
-
         // validar pago
         try {
             // Validación de integración con ms-pagos
@@ -154,6 +135,25 @@ public class PrecioService {
                     "No existe un pago válido asociado"
             );
         }
+
+        // convertir DTO → Entity
+        Precio precio = new Precio();
+
+        precio.setTemporada(
+                dto.getTemporada()
+        );
+
+        precio.setMultiplicador(
+                dto.getMultiplicador()
+        );
+
+        precio.setIdPropiedad(
+                dto.getIdPropiedad()
+        );
+
+        // guardar después de validar todo
+        Precio guardado =
+                repository.save(precio);
 
         log.info(
                 "Precio guardado correctamente con ID {}",
@@ -342,4 +342,3 @@ public class PrecioService {
                 .collect(Collectors.toList());
     }
 }
-
