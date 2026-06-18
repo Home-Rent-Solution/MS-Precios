@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Setter
 @Getter
+// Define la documentación del DTO en Swagger
 @Schema(
         name = "PrecioRequestDTO",
         description = "Datos necesarios para registrar un precio"

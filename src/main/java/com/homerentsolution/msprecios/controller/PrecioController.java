@@ -21,6 +21,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/precios")
+
+// Agrupa todos los endpoints de precios en una sección de Swagger
 @Tag(
         name = "Precios",
         description = "Operaciones relacionadas con precios y temporadas"
@@ -36,10 +38,12 @@ public class PrecioController {
             LoggerFactory.getLogger(PrecioController.class);
 
 
+    // Documenta el propósito del endpoint en Swagger
     @Operation(
             summary = "Listar precios",
             description = "Obtiene todos los precios registrados"
     )
+    // Documenta las posibles respuestas HTTP del endpoint
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
