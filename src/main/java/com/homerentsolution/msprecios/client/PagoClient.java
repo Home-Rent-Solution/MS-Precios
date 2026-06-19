@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
-        name = "ms-pagos",
-        url = "http://localhost:8085"
+        name = "ms-pagos"
 )
 public interface PagoClient {
 
