@@ -149,6 +149,47 @@ class PrecioServiceTest {
         verify(repository, times(1)).save(any(Precio.class));
     }
 
+    private PrecioRequestDTO precioValido() {
+        PrecioRequestDTO dto = new PrecioRequestDTO();
+        dto.setTemporada("Alta");
+        dto.setMultiplicador(1.5);
+        dto.setIdPropiedad(10L);
+        return dto;
+    }
+
+    @Test
+    void guardar_cuandoPropiedadNoExiste_debeLanzarExcepcion() {
+        PrecioRequestDTO dto = precioValido();
+        when(propiedadesClient.buscarPorId(10L)).thenThrow(new RuntimeException("sin propiedad"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.guardar(dto));
+
+        assertEquals("La propiedad no existe", exception.getMessage());
+    }
+
+    @Test
+    void guardar_cuandoReservaNoExiste_debeLanzarExcepcion() {
+        PrecioRequestDTO dto = precioValido();
+        when(propiedadesClient.buscarPorId(10L)).thenReturn(new Object());
+        when(reservaClient.buscarReserva(1)).thenThrow(new RuntimeException("sin reserva"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.guardar(dto));
+
+        assertEquals("No existe una reserva válida asociada", exception.getMessage());
+    }
+
+    @Test
+    void guardar_cuandoPagoNoExiste_debeLanzarExcepcion() {
+        PrecioRequestDTO dto = precioValido();
+        when(propiedadesClient.buscarPorId(10L)).thenReturn(new Object());
+        when(reservaClient.buscarReserva(1)).thenReturn(new Object());
+        when(pagoClient.buscarPago(1L)).thenThrow(new RuntimeException("sin pago"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.guardar(dto));
+
+        assertEquals("No existe un pago válido asociado", exception.getMessage());
+    }
+
     @Test
     void actualizar_cuandoExiste_debeActualizarPrecio() {
 
