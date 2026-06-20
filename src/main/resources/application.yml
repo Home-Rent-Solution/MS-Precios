@@ -1,11 +1,13 @@
 spring:
   application:
-    name: MS-Precios
+    name: ms-precios
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
   datasource:
-    url: jdbc:mysql://localhost:3306/db_precios
-    username: root
-    password: ""
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/db_precios}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -14,10 +16,28 @@ spring:
       ddl-auto: update
     show-sql: true
 
-  eureka:
-    client:
-      service-url:
-        defaultZone: http://localhost:8761/eureka/
-
 server:
-  port: 8088
+  port: ${SERVER_PORT:8088}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
+ms:
+  propiedades:
+    url: ${MS_PROPIEDADES_URL:http://localhost:8081}
+  reservas:
+    url: ${MS_RESERVAS_URL:http://localhost:8084}
+  pagos:
+    url: ${MS_PAGOS_URL:http://localhost:8085}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
