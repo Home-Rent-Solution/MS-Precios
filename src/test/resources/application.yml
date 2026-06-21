@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:precios;MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  cloud:
+    discovery:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+ms:
+  propiedades:
+    url: http://localhost:9999
+  reservas:
+    url: http://localhost:9999
+  pagos:
+    url: http://localhost:9999

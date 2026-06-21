@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 )
 public interface ReservaClient {
 
-    @GetMapping("/reservas/{id}/cliente")
+    @GetMapping("/api/reservas/{id}/cliente")
     Object buscarReserva(
             @PathVariable int id
     );

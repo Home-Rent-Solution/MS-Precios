@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 )
 public interface PagoClient {
 
-    @GetMapping("/api/v1/pagos/{id}")
+    @GetMapping("/api/v1/pagos/recibo/{id}")
     Object buscarPago(
             @PathVariable Long id
     );
