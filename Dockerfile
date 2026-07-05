@@ -2,6 +2,7 @@ FROM eclipse-temurin:25-jdk AS build
 
 WORKDIR /workspace
 COPY . .
+RUN chmod +x mvnw
 RUN --mount=type=cache,target=/root/.m2 ./mvnw clean package -DskipTests
 
 
