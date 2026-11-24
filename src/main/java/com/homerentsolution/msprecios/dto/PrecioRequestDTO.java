@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Setter
 @Getter
 // Define la documentación del DTO en Swagger
@@ -40,4 +43,9 @@ public class PrecioRequestDTO {
     @Positive(message = "El id de propiedad debe ser positivo")
     private Long idPropiedad;
 
+    private LocalDate fechaEntrada;
+
+    private LocalDate fechaSalida;
+    private BigDecimal precioBasePorNoche;
+    private String codigoDescuento;
 }

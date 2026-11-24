@@ -4,6 +4,7 @@ import com.homerentsolution.msprecios.model.Precio;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PrecioRepository extends JpaRepository<Precio, Long> {
     //buscar por temporada alta- media- baja
@@ -16,4 +17,6 @@ public interface PrecioRepository extends JpaRepository<Precio, Long> {
     List<Precio> findByTemporadaOrderByMultiplicadorDesc(
             String temporada);
 
+    @Override
+    Optional<Precio> findById(Long aLong);
 }

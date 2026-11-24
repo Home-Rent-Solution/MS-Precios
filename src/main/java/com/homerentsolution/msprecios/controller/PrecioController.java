@@ -262,5 +262,9 @@ public class PrecioController {
                 )
         );
     }
+    @PostMapping("/calcular")
+    public PrecioResponseDTO calcularPrecio(@RequestBody PrecioRequestDTO request) {
+        return service.calcular(request);
+    }
 }
 

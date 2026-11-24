@@ -9,6 +9,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Setter
@@ -30,4 +32,8 @@ public class Precio {
     //id de propiedad es obligatorio y debe ser positivo
     @Column(nullable = false)
     private Long idPropiedad;
+    @Column(nullable = false)
+    private LocalDate fechaEntrada;
+    @Column(nullable = false)
+    private LocalDate fechaSalida;
 }
