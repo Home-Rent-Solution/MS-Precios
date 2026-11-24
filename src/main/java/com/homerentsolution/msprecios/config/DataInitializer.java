@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
+
 @Configuration
 public class DataInitializer {
 
@@ -40,6 +42,9 @@ public class DataInitializer {
                         1L
                 );
 
+                precio1.setFechaEntrada(LocalDate.of(2026, 12, 15));
+                precio1.setFechaSalida(LocalDate.of(2027, 2, 28));
+
                 repository.save(precio1);
 
                 Precio precio2 =
@@ -56,6 +61,9 @@ public class DataInitializer {
                 precio2.setIdPropiedad(
                         2L
                 );
+
+                precio2.setFechaEntrada(LocalDate.of(2027, 3, 1));
+                precio2.setFechaSalida(LocalDate.of(2027, 6, 30));
 
                 repository.save(precio2);
 
