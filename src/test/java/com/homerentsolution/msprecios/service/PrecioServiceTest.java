@@ -5,6 +5,7 @@ import com.homerentsolution.msprecios.client.PropiedadClient;
 import com.homerentsolution.msprecios.client.ReservaClient;
 import com.homerentsolution.msprecios.dto.PrecioRequestDTO;
 import com.homerentsolution.msprecios.dto.PrecioResponseDTO;
+import com.homerentsolution.msprecios.dto.PropiedadDTO;
 import com.homerentsolution.msprecios.model.Precio;
 import com.homerentsolution.msprecios.repository.PrecioRepository;
 
@@ -254,9 +255,14 @@ class PrecioServiceTest {
         alta.setIdPropiedad(1L);
         when(repository.findByIdPropiedad(1L)).thenReturn(List.of(alta));
 
+        // y MS-Propiedades responde que cuesta 68.000 por noche
+        PropiedadDTO propiedad = new PropiedadDTO();
+        propiedad.setId(1L);
+        propiedad.setPrecio(new BigDecimal("68000"));
+        when(propiedadesClient.obtenerPropiedad(1L)).thenReturn(propiedad);
+
         PrecioRequestDTO request = new PrecioRequestDTO();
         request.setIdPropiedad(1L);
-        request.setPrecioBasePorNoche(new BigDecimal("68000"));
         request.setFechaEntrada(LocalDate.of(2027, 1, 10));
         request.setFechaSalida(LocalDate.of(2027, 1, 13));
 

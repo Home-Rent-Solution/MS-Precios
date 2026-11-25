@@ -6,8 +6,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Setter
@@ -48,5 +46,4 @@ public class PrecioRequestDTO {
 
     @NotNull(message = "La fecha de salida es obligatoria")
     private LocalDate fechaSalida;
-    private BigDecimal precioBasePorNoche;
 }

@@ -3,7 +3,7 @@ package com.homerentsolution.msprecios.service;
 import com.homerentsolution.msprecios.client.PagoClient;
 import com.homerentsolution.msprecios.client.PropiedadClient;
 import com.homerentsolution.msprecios.client.ReservaClient;
-
+import com.homerentsolution.msprecios.dto.PropiedadDTO;
 import com.homerentsolution.msprecios.dto.PrecioRequestDTO;
 import com.homerentsolution.msprecios.dto.PrecioResponseDTO;
 
@@ -318,10 +318,10 @@ public class PrecioService {
     // Calcula el total con la misma regla que usa MS-Reservas al cobrar:
     // precio por noche x multiplicador de la temporada x noches
     public PrecioResponseDTO calcular(PrecioRequestDTO request) {
-        if (request.getIdPropiedad() == null || request.getPrecioBasePorNoche() == null
+        if (request.getIdPropiedad() == null
                 || request.getFechaEntrada() == null || request.getFechaSalida() == null) {
             throw new IllegalArgumentException(
-                    "Para calcular se necesitan idPropiedad, precioBasePorNoche, fechaEntrada y fechaSalida.");
+                    "Para calcular se necesitan idPropiedad, fechaEntrada y fechaSalida.");
         }
         long noches = ChronoUnit.DAYS.between(request.getFechaEntrada(), request.getFechaSalida());
         if (noches <= 0) {
@@ -340,7 +340,15 @@ public class PrecioService {
                 .findFirst()
                 .orElse(reglas.get(0));
 
-        BigDecimal subtotalBase = request.getPrecioBasePorNoche()
+        // el precio por noche se toma de MS-Propiedades, igual que hace MS-Reservas
+        PropiedadDTO propiedad;
+        try {
+            propiedad = propiedadesClient.obtenerPropiedad(request.getIdPropiedad());
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo obtener la propiedad desde MS-Propiedades");
+        }
+
+        BigDecimal subtotalBase = propiedad.getPrecio()
                 .multiply(BigDecimal.valueOf(noches));
         BigDecimal total = subtotalBase
                 .multiply(BigDecimal.valueOf(regla.getMultiplicador()));
