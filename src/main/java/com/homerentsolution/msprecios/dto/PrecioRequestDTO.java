@@ -49,5 +49,4 @@ public class PrecioRequestDTO {
     @NotNull(message = "La fecha de salida es obligatoria")
     private LocalDate fechaSalida;
     private BigDecimal precioBasePorNoche;
-    private String codigoDescuento;
 }

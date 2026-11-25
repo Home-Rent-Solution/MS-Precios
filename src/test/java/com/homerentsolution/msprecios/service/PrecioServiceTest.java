@@ -15,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -241,6 +243,30 @@ class PrecioServiceTest {
         assertEquals("Alta", resultado.get(0).getTemporada());
 
         verify(repository, times(1)).findByTemporada("Alta");
+    }
+
+    @Test
+    void calcular_usaElMultiplicadorDeLaTemporada() {
+        // GIVEN: la propiedad 1 tiene una regla de temporada alta (x1.5)
+        Precio alta = new Precio();
+        alta.setTemporada("Alta");
+        alta.setMultiplicador(1.5);
+        alta.setIdPropiedad(1L);
+        when(repository.findByIdPropiedad(1L)).thenReturn(List.of(alta));
+
+        PrecioRequestDTO request = new PrecioRequestDTO();
+        request.setIdPropiedad(1L);
+        request.setPrecioBasePorNoche(new BigDecimal("68000"));
+        request.setFechaEntrada(LocalDate.of(2027, 1, 10));
+        request.setFechaSalida(LocalDate.of(2027, 1, 13));
+
+        // WHEN
+        PrecioResponseDTO resultado = service.calcular(request);
+
+        // THEN: 68.000 x 3 noches x 1.5 = 306.000
+        assertEquals(3, resultado.getCantidadNoches());
+        assertEquals("Alta", resultado.getTemporada());
+        assertEquals(0, new BigDecimal("306000").compareTo(resultado.getTotalFinal()));
     }
 
     @Test

@@ -18,9 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,10 +28,6 @@ public class PrecioService {
 
     private static final Logger log =
             LoggerFactory.getLogger(PrecioService.class);
-    private static final BigDecimal RECARGO_TEMPORADA_ALTA = new BigDecimal("0.20");
-    private static final BigDecimal DESCUENTO_LARGA_ESTADIA = new BigDecimal("0.10");
-    private static final BigDecimal IMPUESTO_IVA = new BigDecimal("0.19");
-    private static final int NOCHES_PARA_DESCUENTO = 7;
 
     @Autowired
     private PrecioRepository repository;
@@ -321,80 +315,55 @@ public class PrecioService {
                 .collect(Collectors.toList());
     }
 
+    // Calcula el total con la misma regla que usa MS-Reservas al cobrar:
+    // precio por noche x multiplicador de la temporada x noches
     public PrecioResponseDTO calcular(PrecioRequestDTO request) {
-        // 1. Validar fechas y calcular noches
+        if (request.getIdPropiedad() == null || request.getPrecioBasePorNoche() == null
+                || request.getFechaEntrada() == null || request.getFechaSalida() == null) {
+            throw new IllegalArgumentException(
+                    "Para calcular se necesitan idPropiedad, precioBasePorNoche, fechaEntrada y fechaSalida.");
+        }
         long noches = ChronoUnit.DAYS.between(request.getFechaEntrada(), request.getFechaSalida());
         if (noches <= 0) {
             throw new IllegalArgumentException("La fecha de salida debe ser posterior a la fecha de entrada.");
         }
 
-        // 2. Precio base (precio por noche * noches)
+        // igual que MS-Reservas: la regla de la temporada de llegada;
+        // si la propiedad no tiene esa temporada, se usa su primera regla
+        List<Precio> reglas = repository.findByIdPropiedad(request.getIdPropiedad());
+        if (reglas.isEmpty()) {
+            throw new RuntimeException("No existen precios para esta propiedad");
+        }
+        String temporada = temporadaSegunMes(request.getFechaEntrada());
+        Precio regla = reglas.stream()
+                .filter(p -> temporada.equalsIgnoreCase(p.getTemporada()))
+                .findFirst()
+                .orElse(reglas.get(0));
+
         BigDecimal subtotalBase = request.getPrecioBasePorNoche()
                 .multiply(BigDecimal.valueOf(noches));
+        BigDecimal total = subtotalBase
+                .multiply(BigDecimal.valueOf(regla.getMultiplicador()));
 
-        // 3. Recargo por temporada alta (evaluando noche por noche)
-        BigDecimal recargoTemporada = calcularRecargoTemporada(
-                request.getFechaEntrada(),
-                request.getFechaSalida(),
-                request.getPrecioBasePorNoche()
-        );
-
-        BigDecimal subtotalConTemporada = subtotalBase.add(recargoTemporada);
-
-        // 4. Descuentos
-        BigDecimal descuento = calcularDescuento(subtotalConTemporada, noches, request.getCodigoDescuento());
-        BigDecimal subtotalNeto = subtotalConTemporada.subtract(descuento);
-
-        // 5. Impuestos
-        BigDecimal impuestos = subtotalNeto.multiply(IMPUESTO_IVA);
-
-        // 6. Total final
-        BigDecimal total = subtotalNeto.add(impuestos);
-
-        // Construir respuesta
         PrecioResponseDTO response = new PrecioResponseDTO();
-        response.setCantidadNoches(2);
-        response.setSubtotalBase((subtotalBase));
-        response.setRecargoTemporadaAlta((recargoTemporada));
-        response.setDescuentosAplicados((descuento));
-        response.setImpuestos((impuestos));
-        response.setTotalFinal((total));
-
+        response.setIdPropiedad(request.getIdPropiedad());
+        response.setTemporada(regla.getTemporada());
+        response.setMultiplicador(regla.getMultiplicador());
+        response.setCantidadNoches((int) noches);
+        response.setSubtotalBase(subtotalBase);
+        response.setTotalFinal(total);
         return response;
     }
 
-    private BigDecimal calcularRecargoTemporada(LocalDate entrada, LocalDate salida, BigDecimal precioNoche) {
-        BigDecimal recargoTotal = BigDecimal.ZERO;
-        for (LocalDate fecha = entrada; fecha.isBefore(salida); fecha = fecha.plusDays(1)) {
-            if (esTemporadaAlta(fecha)) {
-                recargoTotal = recargoTotal.add(precioNoche.multiply(RECARGO_TEMPORADA_ALTA));
-            }
+    // alta: diciembre a febrero; baja: junio a agosto; media: el resto (igual que MS-Reservas)
+    private String temporadaSegunMes(LocalDate fecha) {
+        int mes = fecha.getMonthValue();
+        if (mes == 12 || mes == 1 || mes == 2) {
+            return "Alta";
         }
-        return recargoTotal;
-    }
-
-    private boolean esTemporadaAlta(LocalDate fecha) {
-        Month mes = fecha.getMonth();
-        return mes == Month.JANUARY || mes == Month.FEBRUARY || mes == Month.JULY;
-    }
-
-    private BigDecimal calcularDescuento(BigDecimal subtotal, long noches, String codigoDescuento) {
-        BigDecimal porcentajeDescuento = BigDecimal.ZERO;
-
-        if (noches >= NOCHES_PARA_DESCUENTO) {
-            porcentajeDescuento = porcentajeDescuento.add(DESCUENTO_LARGA_ESTADIA);
+        if (mes >= 6 && mes <= 8) {
+            return "Baja";
         }
-
-        if ("VERANO2026".equalsIgnoreCase(codigoDescuento)) {
-            porcentajeDescuento = porcentajeDescuento.add(new BigDecimal("0.05"));
-        }
-
-        return subtotal.multiply(porcentajeDescuento);
+        return "Media";
     }
-
-    private BigDecimal redondear(BigDecimal valor) {
-        return valor.setScale(2, RoundingMode.HALF_UP);
-    }
-
-
 }

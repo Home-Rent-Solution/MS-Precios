@@ -40,8 +40,5 @@ public class PrecioResponseDTO {
 
     private Integer cantidadNoches;
     private BigDecimal subtotalBase;
-    private BigDecimal recargoTemporadaAlta;
-    private BigDecimal descuentosAplicados;
-    private BigDecimal impuestos;
     private BigDecimal totalFinal;
 }
