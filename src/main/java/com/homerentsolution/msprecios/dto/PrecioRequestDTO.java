@@ -43,8 +43,10 @@ public class PrecioRequestDTO {
     @Positive(message = "El id de propiedad debe ser positivo")
     private Long idPropiedad;
 
+    @NotNull(message = "La fecha de entrada es obligatoria")
     private LocalDate fechaEntrada;
 
+    @NotNull(message = "La fecha de salida es obligatoria")
     private LocalDate fechaSalida;
     private BigDecimal precioBasePorNoche;
     private String codigoDescuento;

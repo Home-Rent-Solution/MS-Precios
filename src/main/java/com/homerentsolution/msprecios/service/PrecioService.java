@@ -111,40 +111,6 @@ public class PrecioService {
             );
         }
 
-        // validar reserva
-        try {
-            // Validación de integración con ms-reservas
-            // Se utiliza un ID de prueba para verificar comunicación Feign
-            reservaClient.buscarReserva(1);
-
-        } catch (Exception e) {
-
-            log.error(
-                    "No existe una reserva válida asociada"
-            );
-
-            throw new RuntimeException(
-                    "No existe una reserva válida asociada"
-            );
-        }
-
-        // validar pago
-        try {
-            // Validación de integración con ms-pagos
-            // Se utiliza un ID de prueba para verificar comunicación Feign
-            pagoClient.buscarPago(1L);
-
-        } catch (Exception e) {
-
-            log.error(
-                    "No existe un pago válido asociado"
-            );
-
-            throw new RuntimeException(
-                    "No existe un pago válido asociado"
-            );
-        }
-
         // convertir DTO → Entity
         Precio precio = new Precio();
 
@@ -159,6 +125,8 @@ public class PrecioService {
         precio.setIdPropiedad(
                 dto.getIdPropiedad()
         );
+        precio.setFechaEntrada(dto.getFechaEntrada());
+        precio.setFechaSalida(dto.getFechaSalida());
 
         // guardar después de validar todo
         Precio guardado =
@@ -206,6 +174,8 @@ public class PrecioService {
         precio.setIdPropiedad(
                 dto.getIdPropiedad()
         );
+        precio.setFechaEntrada(dto.getFechaEntrada());
+        precio.setFechaSalida(dto.getFechaSalida());
 
         Precio actualizado =
                 repository.save(precio);

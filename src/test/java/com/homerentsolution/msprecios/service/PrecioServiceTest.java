@@ -122,8 +122,6 @@ class PrecioServiceTest {
 
         // Simulamos que las validaciones Feign funcionan correctamente
         when(propiedadesClient.buscarPorId(10L)).thenReturn(new Object());
-        when(reservaClient.buscarReserva(1)).thenReturn(new Object());
-        when(pagoClient.buscarPago(1L)).thenReturn(new Object());
 
         Precio precioGuardado = new Precio();
         precioGuardado.setIdPrecios(1L);
@@ -144,8 +142,6 @@ class PrecioServiceTest {
         assertEquals(10L, resultado.getIdPropiedad());
 
         verify(propiedadesClient, times(1)).buscarPorId(10L);
-        verify(reservaClient, times(1)).buscarReserva(1);
-        verify(pagoClient, times(1)).buscarPago(1L);
         verify(repository, times(1)).save(any(Precio.class));
     }
 
@@ -165,29 +161,6 @@ class PrecioServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class, () -> service.guardar(dto));
 
         assertEquals("La propiedad no existe", exception.getMessage());
-    }
-
-    @Test
-    void guardar_cuandoReservaNoExiste_debeLanzarExcepcion() {
-        PrecioRequestDTO dto = precioValido();
-        when(propiedadesClient.buscarPorId(10L)).thenReturn(new Object());
-        when(reservaClient.buscarReserva(1)).thenThrow(new RuntimeException("sin reserva"));
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.guardar(dto));
-
-        assertEquals("No existe una reserva válida asociada", exception.getMessage());
-    }
-
-    @Test
-    void guardar_cuandoPagoNoExiste_debeLanzarExcepcion() {
-        PrecioRequestDTO dto = precioValido();
-        when(propiedadesClient.buscarPorId(10L)).thenReturn(new Object());
-        when(reservaClient.buscarReserva(1)).thenReturn(new Object());
-        when(pagoClient.buscarPago(1L)).thenThrow(new RuntimeException("sin pago"));
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.guardar(dto));
-
-        assertEquals("No existe un pago válido asociado", exception.getMessage());
     }
 
     @Test

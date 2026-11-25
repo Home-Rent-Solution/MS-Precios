@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -92,6 +93,8 @@ class PrecioControllerTest {
         request.setTemporada("Alta");
         request.setMultiplicador(1.5);
         request.setIdPropiedad(10L);
+        request.setFechaEntrada(LocalDate.of(2027, 3, 1));
+        request.setFechaSalida(LocalDate.of(2027, 11, 30));
 
         PrecioResponseDTO response = new PrecioResponseDTO();
         response.setIdPrecios(1L);
@@ -140,6 +143,8 @@ class PrecioControllerTest {
         request.setTemporada("Baja");
         request.setMultiplicador(1.1);
         request.setIdPropiedad(10L);
+        request.setFechaEntrada(LocalDate.of(2027, 3, 1));
+        request.setFechaSalida(LocalDate.of(2027, 11, 30));
 
         PrecioResponseDTO response = new PrecioResponseDTO();
         response.setIdPrecios(1L);
